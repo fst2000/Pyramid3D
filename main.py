@@ -22,10 +22,11 @@ def map_matrix(function, matrix): return list(map(lambda row: list(map(lambda a:
 
 def transpose(m): return enumerated_matrix(lambda i, j: m[j[i]])
 
-def dot_mat(m1, m2): pass
+def column(matrix, idx : int): return list(map(lambda row: row[idx], matrix))
 
-def y_rotation_matrix3(angle):
-    return [
+def dot_mat(m1, m2): return [dot_vec(row, column(m2, idx)) for row, idx in enumerate(m1)]
+
+def y_rotation_matrix3(angle): return [
     [math.cos(angle), 0, math.sin(angle)],
     [0, 1, 0],
     [-math.sin(angle), 0, math.cos(angle)]
