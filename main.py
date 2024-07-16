@@ -16,7 +16,7 @@ def dot_vec(v1, v2): return sum(map(lambda a1, a2: a1 * a2, v1.values(), v2.valu
 
 def matrix(size : int): return enumerated_matrix(lambda i, j: 1 if i == j else 0, size)
 
-def enumerated_matrix(function, size : int): return list(map(lambda i: list(map(lambda j: function(i, j), range(size))), range(size)))
+def enumerated_matrix(function, size : int): return tuple(tuple(function(i, j) for j in range(size)) for i in range(size))
 
 def map_matrix(function, matrix): return list(map(lambda row: list(map(lambda a: function(a), row)), matrix))
 
@@ -24,7 +24,7 @@ def transpose(m): return enumerated_matrix(lambda i, j: m[j[i]])
 
 def column(matrix, idx : int): return list(map(lambda row: row[idx], matrix))
 
-def dot_mat(m1, m2): return [dot_vec(row, column(m2, idx)) for row, idx in enumerate(m1)]
+def dot_mat(m1, m2): return [dot_vec(row, column(m2, idx)) for idx, row in enumerate(m1)]
 
 def y_rotation_matrix3(angle): return [
     [math.cos(angle), 0, math.sin(angle)],
