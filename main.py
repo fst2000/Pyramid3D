@@ -14,11 +14,15 @@ def angle(v1, v2): return math.acos(dot_vec(v1, v2) / length(v1) * length(v2))
 
 def dot_vec(v1, v2): return sum(map(lambda a1, a2: a1 * a2, v1.values(), v2.values()))
 
-def matrix4(): return list(map(lambda i: list(map(lambda j: 1 if i == j else 0, range(4))), range(4)))
+def matrix(size : int): return enumerated_matrix(lambda i, j: 1 if i == j else 0, size)
 
-def transpose(mat, size): return list(map(lambda a, i: a, mat, range(reduce(mul, size))))
+def enumerated_matrix(function, size : int): return list(map(lambda i: list(map(lambda j: function(i, j), range(size))), range(size)))
 
-def dot_mat4(m1, m2): pass
+def map_matrix(function, matrix): return list(map(lambda row: list(map(lambda a: function(a), row)), matrix))
+
+def transpose(m): return enumerated_matrix(lambda i, j: m[j[i]])
+
+def dot_mat(m1, m2): pass
 
 def y_rotation_matrix3(angle):
     return [
