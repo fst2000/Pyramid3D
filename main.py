@@ -32,24 +32,21 @@ def y_rot_mat(angle): return [
     [-math.sin(angle), 0, math.cos(angle)]
     ]
 
-def map_face(matrix, face): return tuple(map(lambda v: dot_mat_vec(matrix, v), face))
+def transform_face(matrix, face): return tuple(map(lambda v: dot_mat_vec(matrix, v), face))
+
+def transform_mesh(matrix, mesh): return tuple(map(lambda f: transform_face(matrix, f), mesh))
 
 def draw_face(face):
     for vec in face:
+        glColor3f(*vec)
         glVertex(*vec)
 
 def normal(face):
     return
 
-def draw(angle : float):
+def draw(mesh):
     glBegin(GL_TRIANGLES)
-    pyramid_faces = (((0, 0.5, 0), (0.5, -0.5, 0.5), (-0.5, -0.5, 0.5)),
-                     ((0, 0.5, 0), (0.5, -0.5, -0.5), (-0.5, -0.5, -0.5)),
-                     ((0, 0.5, 0), (0.5, -0.5, -0.5), (0.5, -0.5, 0.5)),
-                     ((0, 0.5, 0), (-0.5, -0.5, 0.5), (-0.5, -0.5, 0.5)))
-    rot_matrix = y_rot_mat(angle)
-    pyramid_faces = tuple(map(lambda face: map_face(rot_matrix, face), pyramid_faces))
-    for face in pyramid_faces: draw_face(face)
+    for face in mesh: draw_face(face)
     glEnd()
 
 def start_window():
@@ -64,11 +61,15 @@ def start_window():
 def main():
     glfw.init()
     window = start_window()
-    angle = 30.0
+    angle = 0.0
+    pyramid_mesh = (((0, 0.5, 0), (0.5, -0.5, 0.5), (-0.5, -0.5, 0.5)),
+                     ((0, 0.5, 0), (0.5, -0.5, -0.5), (-0.5, -0.5, -0.5)),
+                     ((0, 0.5, 0), (0.5, -0.5, -0.5), (0.5, -0.5, 0.5)),
+                     ((0, 0.5, 0), (-0.5, -0.5, 0.5), (-0.5, -0.5, 0.5)))
     while not glfw.window_should_close(window):
         glfw.poll_events()
         glClear(GL_COLOR_BUFFER_BIT)
-        draw(angle)
+        draw(transform_mesh(y_rot_mat(angle), pyramid_mesh))
         angle += 0.001
         glfw.swap_buffers(window)
     glfw.terminate()
