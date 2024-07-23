@@ -2,6 +2,8 @@ import math
 from functools import reduce
 from operator import mul
 import glfw
+
+from OpenGL.GLUT import *
 from OpenGL.GL import *
 
 def length(vec): return math.sqrt(sum(map(lambda i: i * i), vec))
@@ -13,6 +15,8 @@ def dot_vec(v1, v2): return sum(map(lambda a1, a2: a1 * a2, v1, v2))
 def sum_vec(*vecs): return tuple(sum(values) for values in zip(*vecs))
 
 def scale_vec(vec, scale): return tuple(map(lambda value: value * scale))
+
+def average_vec(*vecs): return scale_vec(sum_vec(vecs), len(vecs))
 
 def cross(v1, v2): pass
 
@@ -78,11 +82,12 @@ def start_window():
 def main():
     glfw.init()
     window = start_window()
+    glEnable(GL_DEPTH_TEST)
     angle = 0.0
     pyramid_mesh = mesh_from_obj(open("pyramid.obj").read())
     while not glfw.window_should_close(window):
         glfw.poll_events()
-        glClear(GL_COLOR_BUFFER_BIT)
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         draw(transform_mesh(y_rot_mat(angle), pyramid_mesh))
         angle += 0.001
         glfw.swap_buffers(window)
