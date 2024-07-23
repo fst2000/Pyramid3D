@@ -39,8 +39,9 @@ def column(matrix, idx : int): return tuple(map(lambda row: row[idx], matrix))
 def dot_mat(m1, m2): return tuple(enumerated_matrix(lambda i, j: dot_vec(m1[i], column(m2, j)), len(m1)))
 
 def dot_mat_vec(m, v):
+    vec_len = len(v)
     if len(v) < len(m): v = v + ((0,) * (len(m) - len(v) - 1) + (1, ))
-    return tuple(dot_vec(row, v) for row in m)
+    return tuple(dot_vec(row, v) for row in m)[:vec_len]
 
 def y_rot_mat(angle): return [
     [math.cos(angle), 0, math.sin(angle), 0],
@@ -55,11 +56,17 @@ def transform_mesh(matrix, mesh): return tuple(map(lambda f: transform_face(matr
 
 def load_texture(image):
     image = image.convert('RGB')
+    image = image.transpose(Image.FLIP_TOP_BOTTOM)
     image_data = np.array(list(image.getdata()), np.uint8)
     texture_id = glGenTextures(1)
     glBindTexture(GL_TEXTURE_2D, texture_id)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image.width, image.height, 0, GL_RGB, GL_UNSIGNED_BYTE, image_data)
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
     return texture_id
+
 
 def mesh_from_obj(obj_file):
     lines = obj_file.split("\n")
@@ -76,7 +83,7 @@ def draw_face(face, vertex_col_func):
     for vertex in face:
         glColor3f(*vertex_col_func(vertex))
         glTexCoord2f(*vertex["texcoord"])
-        glVertex(*vertex["point"])
+        glVertex3f(*vertex["point"])
 
 def draw(mesh, vertex_col_func, texture_id):
     glBindTexture(GL_TEXTURE_2D, texture_id)
@@ -109,8 +116,8 @@ def main():
     texture_id = load_texture(Image.open("skin_winter.png"))
     while not glfw.window_should_close(window):
         glfw.poll_events()
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         transform_matrix = y_rot_mat(angle)
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         draw(transform_mesh(
             transform_matrix, mesh),
             lambda vertex: scale_vec((1.0, 1.0, 1.0), dot_vec(dot_mat_vec(transform_matrix, vertex["normal"]), inverse_vec(cam_dir))),
