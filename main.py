@@ -94,7 +94,7 @@ def main():
         transform_matrix = y_rot_mat(angle)
         draw(transform_mesh(
             transform_matrix, pyramid_mesh),
-            lambda vertex: scale_vec((1.0, 1.0, 1.0), dot_vec(vertex["normal"], dot_mat_vec(transform_matrix, (0.0, 0.0, -1.0)))))
+            lambda vertex: scale_vec((1.0, 1.0, 1.0), dot_vec(dot_mat_vec(transform_matrix, vertex["normal"]), (0.0, 0.0, -1.0))))
         angle += 0.01
         glfw.swap_buffers(window)
     glfw.terminate()
